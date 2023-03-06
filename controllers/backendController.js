@@ -30,7 +30,7 @@ const uploadFile = (req, res) => {
 
     if (!replace) {
 
-        const fileName = `${uuidv4()}-${attachedFile.name}`;
+        const fileName = `${uuidv4()}-${attachedFile?.name.replace(' ', '-')}`;
         const pathName = path.join(process.env.ROOT_FILE_UPLOAD_PATH, meta, fileName);
     
         attachedFile.mv(pathName, (error) => {
