@@ -4,8 +4,8 @@
   "description": "Backend Server for Brahmware",
   "main": "server.js",
   "scripts": {
-    "test": "node server.js",
-    "devStart": "nodemon server.js"
+    "start": "nodemon server.js",
+    "deploy": "node server.js"
   },
   "keywords": [
     "backend",

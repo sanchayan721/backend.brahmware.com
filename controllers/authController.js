@@ -3,17 +3,23 @@ const jwt = require('jsonwebtoken');
 const { httpSuccessCodes, httpErrorCodes } = require('../utils/httpStatusCodes');
 const { cookieExtras } = require('../utils/cookieExtras');
 const TokenGenerator = require('../helpers/TokenGenerator');
+const ErrorSender = require('../helpers/ErrorSender');
+const { ALT } = require('../utils/properties');
+const ApplicationError = require('../utils/ApplicationError');
+const { sendNoUserFoundError } = require('../utils/commonErrors/noUserFound');
+const { sendIncompleteForm } = require('../utils/commonErrors/incompleteForm');
 
 const handleLogin = async (req, res) => {
-
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
+    const { user, password } = req.body;
+    if (!user || !password) return sendIncompleteForm(res, `Username or Email and password are required.`)
 
     const foundUser = await User.findOne({
-        $or: [{ username: username }, { email: username }]
+        $or: [{ username: user }, { email: user }]
     }).select("+password").exec(); // Password field is not selected by default
 
-    if (!foundUser) return res.status(401).json({ 'message': 'Username or Password is incorrect!' }); //Unauthorized 
+    if (!foundUser) return sendNoUserFoundError(res);
+
+    console.log(foundUser)
 
     // evaluate password 
     const match = await foundUser.matchPasswords(password);
@@ -48,7 +54,18 @@ const handleLogin = async (req, res) => {
 
     }
 
-    else return res.status(401).json({ 'message': 'Wrong Username or Password!' });
+    else return new ErrorSender(
+        new ApplicationError(
+            'Unauthorized',
+            httpErrorCodes.clientError.ACCESS_UNAUTHORIZED,
+            {
+                errorType: 'UNAUTHORIZED_USER',
+                property: ALT,
+                errorMessage: `Wrong Username or Password!`
+            }
+        ),
+        res
+    ).sendError();
 
 };
 
@@ -89,8 +106,55 @@ const handleRefresh = async (req, res) => {
     );
 };
 
+const handleResetPassword = async (req, res) => {
+
+    console.log(req.body)
+    const { user, password } = req.body;
+    if (!user || !password) return new ErrorSender(
+        new ApplicationError(
+            'No user',
+            httpErrorCodes.clientError.ENTRY_NOT_ACCEPTABLE,
+            {
+                errorType: 'INCOMPLETE_INFORMATION',
+                property: ALT,
+                errorMessage: `Please provide your Username or Email and password.`
+            }
+        ),
+        res
+    ).sendError();
+
+    const foundUser = await User.findOne({
+        $or: [{ username: user }, { email: user }]
+    }).select("+password").exec();
+
+    if (!foundUser) return sendNoUserFoundError(res);
+
+    foundUser.password = password;
+
+    try {
+        await foundUser.save();
+        res.status(httpSuccessCodes.ACCPEPTED).json({
+            "message": `Successfully updated your Password.`
+        });
+    } catch (error) {
+        console.log(error)
+        return new ErrorSender(
+            new ApplicationError(
+                'No user',
+                httpErrorCodes.clientError.ENTRY_NOT_ACCEPTABLE,
+                {
+                    errorType: 'SERVER_ERROR',
+                    property: ALT,
+                    errorMessage: `Could not update your password. Please try again later.`
+                }
+            ),
+            res
+        ).sendError();
+    }
+}
+
 const handleLogout = async (req, res) => {
-    
+
 };
 
-module.exports = { handleLogin, handleRefresh, handleLogout };
+module.exports = { handleLogin, handleRefresh, handleLogout, handleResetPassword };

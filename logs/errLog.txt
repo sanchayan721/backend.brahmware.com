@@ -47,3 +47,5 @@
 20230305	15:43:22	e1fccc39-8a79-4b19-b3f8-e040dae5c2f5	TypeError: Cannot read property 'name' of undefined
 20230305	16:51:30	922b16aa-e1fd-4cb8-a14b-7a2b2ba7a824	ReferenceError: relatedTo is not defined
 20230305	16:52:21	897d8279-0105-4b86-883a-8dcdf318fc87	ReferenceError: relatedTo is not defined
+20230309	01:35:39	896fc3fd-1eeb-43f7-be4f-42b4233404d5	URIError: Failed to decode param '4f4dc230-f26b-490b-b174-ec6fa980a108-WhatsApp%20Image%202022-09-19%20at%201.57.58%2s0PM.jpeg'
+20230309	02:26:45	b0aad7bd-691a-433f-a84b-fa22da2127be	TypeError: The "path" argument must be of type string. Received undefined
