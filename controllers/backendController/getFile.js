@@ -5,6 +5,7 @@ const ApplicationError = require("../../utils/ApplicationError");
 const { httpErrorCodes } = require("../../utils/httpStatusCodes");
 const fileSystem = require('fs');
 const defaultFileNames = require("../../configs/defaultFileNames");
+const supportedFileTypes = require("../../configs/supportedFileTypes");
 
 const getFile = async (req, res) => {
 
@@ -63,7 +64,17 @@ const getFile = async (req, res) => {
     };
 
     const filePath = path.join(process.env.ROOT_FILE_UPLOAD_PATH, meta, fileName);
+
     const defaultFilePath = path.join(process.env.ROOT_FILE_UPLOAD_PATH, meta, defaultFileNames.profilePicture);
+    const statistics = fileSystem.statSync(filePath);
+    
+    if(filePath.includes(supportedFileTypes.media.picture.svg)) {
+        res.writeHead(200, {
+            'Content-Type': 'application/xml',
+            'Content-Length': statistics.size
+        });
+    }; 
+    
     const readStream = fileSystem.createReadStream(filePath);
     readStream.on('error', function (err) {
         const defaultFilestream = fileSystem.createReadStream(defaultFilePath);

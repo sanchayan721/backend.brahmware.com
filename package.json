@@ -4,7 +4,7 @@
   "description": "Backend Server for Brahmware",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon --inspect server.js",
     "deploy": "node server.js"
   },
   "keywords": [
