@@ -14,7 +14,7 @@
   "author": "brahmware.com",
   "license": "SEE LICENSE IN <filename>",
   "engines": {
-    "node": "14.x"
+    "node": "18.x"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
