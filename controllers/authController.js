@@ -17,9 +17,7 @@ const handleLogin = async (req, res) => {
         $or: [{ username: user }, { email: user }]
     }).select("+password").exec(); // Password field is not selected by default
 
-    if (!foundUser) return sendNoUserFoundError(res);
-
-    console.log(foundUser)
+    if (!foundUser) return sendNoUserFoundError(res)
 
     // evaluate password 
     const match = await foundUser.matchPasswords(password);
